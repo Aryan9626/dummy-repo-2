@@ -10,7 +10,7 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await axios.post('http://localhost:3000/bmi', { name, weight, height });
+    const response = await axios.post('http://localhost:4000/bmi', { name, weight, height });
     setData(response.data);
     setName('');
     setWeight('');
