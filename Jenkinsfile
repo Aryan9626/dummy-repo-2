@@ -2,18 +2,22 @@ pipeline {
     agent any
 
     environment {
-        // Define environment variables
+        // Define environment variables for images and branch
         CLIENT_IMAGE = 'aryan9626/client-image'
         SERVER_IMAGE = 'aryan9626/server-image'
         GIT_BRANCH = 'main'  // Specify your branch here if it's 'main' instead of 'master'
+        
+        // Define credentials IDs
+        GIT_CREDENTIALS_ID = '75a960a6-e356-41ca-9da2-2290a8a63106'  // ID for Git credentials
+        DOCKER_CREDENTIALS_ID = '25a17427-796d-420c-bb6c-77bacfc2a2ea'  // ID for Docker Hub credentials
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Checkout from a specific branch
+                // Checkout from a specific branch using environment variable for credentials ID
                 git branch: "${env.GIT_BRANCH}", 
-                    credentialsId: '75a960a6-e356-41ca-9da2-2290a8a63106', 
+                    credentialsId: "${env.GIT_CREDENTIALS_ID}", 
                     url: 'https://github.com/Aryan9626/dummy-repo-2.git'
             }
         }
@@ -45,16 +49,22 @@ pipeline {
             steps {
                 dir('client') {
                     script {
-                        // Build and push the client Docker image
+                        // Build the client Docker image
                         sh "docker build -t ${CLIENT_IMAGE} ."
-                        sh "docker push ${CLIENT_IMAGE}"
+                        // Authenticate and push the client Docker image using environment variable for credentials
+                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_CREDENTIALS_ID}") {
+                            sh "docker push ${CLIENT_IMAGE}"
+                        }
                     }
                 }
                 dir('server') {
                     script {
-                        // Build and push the server Docker image
+                        // Build the server Docker image
                         sh "docker build -t ${SERVER_IMAGE} ."
-                        sh "docker push ${SERVER_IMAGE}"
+                        // Authenticate and push the server Docker image using environment variable for credentials
+                        docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_CREDENTIALS_ID}") {
+                            sh "docker push ${SERVER_IMAGE}"
+                        }
                     }
                 }
             }
