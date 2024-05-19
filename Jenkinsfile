@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         // Define environment variables for images and branch
-        CLIENT_IMAGE = 'aryan9626/client-image'
-        SERVER_IMAGE = 'aryan9626/server-image'
+        CLIENT_IMAGE = 'aryan9626/bmi-app-repo:client-latest'
+        SERVER_IMAGE = 'aryan9626/bmi-app-repo:server-latest'
         GIT_BRANCH = 'main'  // Specify your branch here if it's 'main' instead of 'master'
         
         // Define credentials IDs
@@ -51,7 +51,7 @@ pipeline {
                     script {
                         // Build the client Docker image
                         sh "docker build -t ${CLIENT_IMAGE} ."
-                        // Authenticate and push the client Docker image using environment variable for credentials
+                        // Authenticate and push the client Docker image
                         docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_CREDENTIALS_ID}") {
                             sh "docker push ${CLIENT_IMAGE}"
                         }
@@ -61,7 +61,7 @@ pipeline {
                     script {
                         // Build the server Docker image
                         sh "docker build -t ${SERVER_IMAGE} ."
-                        // Authenticate and push the server Docker image using environment variable for credentials
+                        // Authenticate and push the server Docker image
                         docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKER_CREDENTIALS_ID}") {
                             sh "docker push ${SERVER_IMAGE}"
                         }
